@@ -1,0 +1,24 @@
+# Heatmap
+library(ComplexHeatmap)
+
+mat <- read.table("DEG_norm_LVN_treated_parent_ref_biotics.txt",sep="\t", header=T)
+head(mat)
+
+row_filter <- read.table("DEG_filter_LVN_treated_parent_ref_biotics.txt",sep="\t", header=T)
+head(row_filter)
+
+mat <- mat[row_filter$X,]
+mat
+
+mat.z <- t(apply(mat, 1, scale))
+colnames(mat.z) <- rownames(coldata)
+mat.z
+
+mat.z <- na.omit(mat.z)
+mat.z
+
+map <- Heatmap(mat.z, cluster_rows = T, cluster_columns = T, column_labels = colnames(mat.z), name = "Z-score")
+
+tiff(file="Heatmap_LVN_treated_parent_ref_biotics.tiff", width=11, height=7, units="in",res=300)
+map
+dev.off()
