@@ -1,0 +1,39 @@
+#GSEA analysis
+library(GSA)
+library(fgsea)
+library(msigdbr)
+library(clusterProfiler)
+library(stats)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(enrichplot)
+
+DEG_filter <- read.table("filtered_logfc2_DEG_MB_LEN_treaetd_vs_non.txt", header=T, sep="\t", fill=T)
+head(DEG_filter)
+
+all(is.na(DEG_filter))
+
+gene <- DEG_filter$log2FoldChange
+head(gene)
+
+names(gene) <- DEG_filter$X
+gene <- sort(gene, decreasing = TRUE)
+gene <- gene[!duplicated(names(gene))]
+
+m_t2g <- msigdbr(species = "Mus musculus", category = "H") %>% 
+  dplyr::select(gs_name, gene_symbol)
+head(m_t2g)
+
+RES <- GSEA(gene, pvalueCutoff = 0.05, TERM2GENE = m_t2g)
+head(RES)
+
+write.table(RES, "GSEA_logfc2_DEG_MB_LEN_treaetd_vs_non.txt", sep = "\t")
+
+pathway <- gseaplot2(RES, geneSetID = 3, title = RES$Description[3])
+pathway
+
+tiff(file="gsea_pathway_IL2_logfc2_DEG_MB_LEN_treaetd_vs_non.tiff", width=8, height=8, units="in",res=300)
+pathway
+dev.off()
