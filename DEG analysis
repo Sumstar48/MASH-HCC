@@ -70,30 +70,3 @@ map <- Heatmap(mat.z, cluster_rows = T, cluster_columns = T, column_labels = col
 tiff(file="Heatmap_LVN_treated_parent_ref_biotics.tiff", width=11, height=7, units="in",res=300)
 map
 dev.off()
-
-#Volcano plot
-library(ggplot2)
-
-DEG <- read.table("DEG_MB_LEN_treaetd_vs_non.txt", header = TRUE)
-DEG$diffexpressed <- "NO"
-DEG$diffexpressed[DEG$log2FoldChange > 1 & DEG$padj < 0.05] <- "UP"
-DEG$diffexpressed[DEG$log2FoldChange < -1 & DEG$padj < 0.05] <- "DOWN"
-
-head(DEG)
-
-plot <- ggplot(data=DEG, aes(x=log2FoldChange, y=-log10(padj), col=diffexpressed)) +
-  geom_point() + 
-  theme_classic() +
-  scale_color_manual(values=c("blue", "grey", "red")) +
-  xlim(c(-15,15)) +
-  geom_vline(xintercept=c(-1, 1), col="black", lty=4, lwd=0.7) +
-  geom_hline(yintercept=-log10(0.05), col="black", lty=4, lwd=0.7) +
-  labs(x = bquote(~Log[2]~fold~change), y = bquote(~-log[10]~Q~value)) +
-  theme(legend.title = element_blank(), legend.position = "top", axis.title = element_text(size = 15),
-        axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 15))
-
-plot
-
-tiff(file="Volcano_MB_LEN_treaetd_vs_non.tiff", width=5, height=7, units="in",res=300)
-plot
-dev.off()
